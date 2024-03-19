@@ -13,12 +13,14 @@ const Chats = () => {
     const getChats = () => {
       const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
         setChats(doc.data());
+        console.log("Chats:",doc.data())
       });
 
       return () => {
         unsub();
       };
     };
+
 
     currentUser.uid && getChats();
   }, [currentUser.uid]);
