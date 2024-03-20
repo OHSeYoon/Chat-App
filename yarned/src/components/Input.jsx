@@ -50,6 +50,26 @@ const Input = () => {
       }
     );
   };
+  const string1 = "QEHrtZl5woQnAxdAAR8ErIgi4C13";
+const string2 = "QEHrtZl5woQnAxdAAR8ErIgi4C13EJIGyIvDGJWy47RwR7qJP0PMjnz1";
+
+// Find the common prefix
+let commonPrefix = "";
+for (let i = 0; i < Math.min(string1.length, string2.length); i++) {
+    if (string1[i] === string2[i]) {
+        commonPrefix += string1[i];
+    } else {
+        break;
+    }
+}
+
+// Extract the difference
+const difference = string2.substring(commonPrefix.length);
+
+console.log("Difference:", difference);
+
+
+  
 
   const handleSend = async () => {
     await updateDoc(doc(db, "chats",data.chatId ), {
@@ -59,8 +79,11 @@ const Input = () => {
         img: currentUser.photoURL,    
       }),
 
-      last: ({lastMessage:text})
     });
+
+    await updateDoc(doc(db,"users",currentUser.uid),{
+      [data.chatId]:text
+    })
 
     setText("");
     setFile(null);

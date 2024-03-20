@@ -36,6 +36,7 @@ const Chats = () => {
   const handleSelect = (u) => {
     dispatch({ type: "CHANGE_USER", payload: u.id });
     console.log(`Chats: \nSelected User: ${u.id}\nCurrent User: ${currentUser.uid}`);
+    console.log("TESTING",u.data[data.chatId])
     setTrigger(u)
 
   };
@@ -51,7 +52,9 @@ const Chats = () => {
           <img src={user.data.photoURL} alt="" /> 
           <div className="userChatInfo">
             <span>{user.data.displayName}</span>
-            <p>{user.data.lastMessage?.text}</p>
+            {user.data[data.chatId] && (
+    <p>{user.data[data.chatId]}</p>
+)}
           </div>
           
 

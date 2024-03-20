@@ -7,7 +7,7 @@ import {
 } from "react";
 import { AuthContext } from "./AuthContext";
 import { db } from "../firebase";
-import { collection, getDocs,getDoc,doc,setDoc } from "firebase/firestore";
+import { collection, getDocs,getDoc,doc,setDoc,updateDoc } from "firebase/firestore";
 
 export const ChatContext = createContext();
 
@@ -51,11 +51,11 @@ export const ChatContextProvider = ({ children }) => {
       if (!chatCheck.exists()) {
 
         await setDoc(chatCode, {
-          participants: [u.uid,currentUser.uid],
+          participants: [u.id,currentUser.uid],
           messages:'' ,
-          last: '',
           createdAt: new Date(),
         });
+        
 
         console.log("CHAT CONETX: CHAT CREATED");
       }
