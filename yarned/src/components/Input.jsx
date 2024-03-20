@@ -73,7 +73,11 @@ const Input = () => {
 
     uids.forEach(uid => {
       if (data.chatId.includes(uid)) {
-        console.log("Match found for chatId:", uid);
+        updateDoc(doc(db, "users", uid), {
+          [data.chatId]: text,
+        });
+        console.log("UPDATED: ",uid)
+        
       }
     });
 
