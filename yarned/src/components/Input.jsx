@@ -81,8 +81,6 @@ const Input = () => {
       }
     });
 
-
-
     setText("");
     setFile(null);
   };
