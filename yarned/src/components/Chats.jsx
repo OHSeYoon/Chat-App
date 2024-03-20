@@ -5,9 +5,10 @@ import { ChatContext } from "../context/ChatContext";
 import { db } from "../firebase";
 
 const Chats = () => {
-  const [users, setUsers] = useState([]); // Corrected variable name to "users"
+  const [users, setUsers] = useState([]); 
   const { currentUser } = useContext(AuthContext);
-  const { dispatch } = useContext(ChatContext);
+  const { data, dispatch,createCode,setTrigger } = useContext(ChatContext);
+
 
   useEffect(() => {
     const getUsers = async () => {
@@ -20,7 +21,7 @@ const Chats = () => {
           usersData.push({ id: doc.id, data: doc.data() });
         });
 
-        // Set the users data in state
+    
         setUsers(usersData);
         console.log("Chats:", usersData);
       } catch (error) {
@@ -28,23 +29,26 @@ const Chats = () => {
       }
     };
 
-    getUsers(); // Call the function to fetch users when the component mounts
+    getUsers(); 
 
   }, []);
 
-  const handleSelect = () => {
-    console.log("uhjkhj");
+  const handleSelect = (u) => {
+    dispatch({ type: "CHANGE_USER", payload: u.id });
+    console.log(`Chats: \nSelected User: ${u.id}\nCurrent User: ${currentUser.uid}`);
+    setTrigger(u)
+
   };
 
   return (
     <div className="chats">
-      {users.map((user) => ( // Use "users" state instead of "chats"
+      {users.map((user) => ( 
         <div
           className="userChat"
-          key={user.id} // Access the "id" property of each user object
-          onClick={() => handleSelect()}
+          key={user.id} 
+          onClick={() => handleSelect(user)}
         >
-          <img src={user.data.photoURL} alt="" /> {/* Access user data properties */}
+          <img src={user.data.photoURL} alt="" /> 
           <div className="userChatInfo">
             <span>{user.data.displayName}</span>
             <p>{user.data.lastMessage?.text}</p>
