@@ -1,29 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CardInputForm from '../cardscomponents/CardInput';
 import Cards from '../cardscomponents/Cards';
-import unoun from "../img/201.png";
-import balt from "../img/343.png";
-import chim from "../img/358.png";
-
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase'; // Assuming you have initialized Firebase in '../firebase'
 
 const Test = () => {
+  const [cards, setCards] = useState([]);
 
-    function importAllImages(r) {
-        let images = {};
-        r.keys().map((item, index) => {
-          images[item.replace('./', '')] = r(item);
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'cards'));
+        const fetchedCards = [];
+        querySnapshot.forEach((doc) => {
+          fetchedCards.push(doc.data());
         });
-        return images;
+        setCards(fetchedCards);
+      } catch (error) {
+        console.error('Error fetching cards:', error);
       }
-      
-      
-      const images = importAllImages(require.context('../img', false, /\.(png|jpe?g|svg)$/));
-    const [cards, setCards] = useState([
-        { title: 'Card 1', description: 'Description for Card 1', image: unoun },
-        { title: 'Card 2', description: 'Description for Card 2', image: balt },
-        { title: 'Card 3', description: 'Description for Card 3', image: chim },
-      ]);
+    };
 
+    fetchCards();
+  }, []); 
   const handleAddCard = (newCard) => {
     setCards([...cards, newCard]);
   };

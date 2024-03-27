@@ -19,7 +19,7 @@ const Cards = ({cards}) => {
             {cards.map((card, index) => (
               <div key={index} className="card">
                 <h2>{card.title}</h2>
-                <img src={card.image} alt={card.title} />
+                <img src={card.imageUrl} alt={card.title} />
                 <p>{card.description}</p>
               </div>
             ))}
