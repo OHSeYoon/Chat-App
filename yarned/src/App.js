@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Test from "./pages/Test";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
@@ -29,6 +30,7 @@ function App() {
           />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="test" element={<Test />} />
         </Route>
       </Routes>
     </BrowserRouter>
