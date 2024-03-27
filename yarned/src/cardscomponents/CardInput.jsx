@@ -1,25 +1,60 @@
 import React, { useState } from 'react';
+import firebase from 'firebase/app';
+import {
+  arrayUnion,
+  addDoc,
+  doc,
+  serverTimestamp,
+  Timestamp,
+  collection,
+  updateDoc,
+  getDocs
+} from "firebase/firestore";
+import { db, storage } from "../firebase";
+import { v4 as uuid } from "uuid";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 const CardInputForm = ({ onAddCard }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || !imageFile) return;
-
-    // Convert image file to base64 data URL
-    const reader = new FileReader();
-    reader.readAsDataURL(imageFile);
-    reader.onload = () => {
-      const imageUrl = reader.result;
-      onAddCard({ title, description, imageUrl });
-    };
-
-    setTitle('');
-    setDescription('');
-    setImageFile(null);
+  
+    try {
+      const storageRef = ref(storage, uuid());
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+  
+      uploadTask.on(
+        "state_changed",
+        null,
+        (error) => {
+          console.error(error);
+        },
+        async () => {
+          try {
+            const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            // Add card data to Firestore
+            const docRef = await addDoc(collection(db, "cards"), {
+              title,
+              description,
+              imageUrl,
+            });
+            onAddCard({ title, description, imageUrl, id: docRef.id });
+            setTitle("");
+            setDescription("");
+            setImageFile(null);
+            console.log("CardInput: Upload Sucess!!!")
+          } catch (error) {
+            console.error("Error uploading file:", error);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
 
   const handleImageChange = (e) => {
@@ -41,12 +76,17 @@ const CardInputForm = ({ onAddCard }) => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-      />
-      <button type="submit">Add Card</button>
+      <div className="send">
+        <input
+          type="file"
+          style={{ display: "none" }}
+          id="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+        <label htmlFor="file">Choose Image</label>
+        <button type="submit">Add Card</button>
+      </div>
     </form>
   );
 };
