@@ -1,0 +1,59 @@
+.card-slider {
+    width: 100%;
+    overflow: hidden;
+    max-width: 800px; /* Set maximum width */
+    margin: 0 auto; /* Center the slider horizontally */
+  }
+  
+  .slider {
+    display: flex;
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden; /* Ensure overflow is hidden for responsive behavior */
+  }
+  
+  .cards {
+    display: flex;
+    transition: transform 0.5s ease;
+    min-width: 100%; /* Ensure cards take up minimum width */
+  }
+  
+  .card {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    border-right: 1px solid #ddd;
+  }
+  
+  .card:last-child {
+    border-right: none;
+  }
+  
+  .card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+  
+  .prev,
+  .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+  }
+  
+  .prev {
+    left: 0;
+  }
+  
+  .next {
+    right: 0;
+  }
