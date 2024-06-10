@@ -29,7 +29,7 @@ export const ChatContextProvider = ({ children }) => {
             : action.payload + currentUser.uid;
 
         return {
-          ...state,
+          ...state, // In this way ANY OTHER change on the state WILL NOT change EXEPT user and chatID
           user: action.payload,
           chatId: newChatId,
         };
