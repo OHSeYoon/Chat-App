@@ -1,19 +1,13 @@
-
 import React, { useContext, useState } from "react";
-import volt from "../img/100.png";
-import eletro from "../img/101.png";
-import svolt from "../img/S100.png"
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
-
 import {
   arrayUnion,
   doc,
-  serverTimestamp,
-  Timestamp,
-  collection,
   updateDoc,
-  getDocs
+  getDoc,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
@@ -23,7 +17,7 @@ const Input = () => {
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
   const { currentUser } = useContext(AuthContext);
-  const { data, dispatch, createCode, setTrigger } = useContext(ChatContext);
+  const { data } = useContext(ChatContext);
 
   const handleFileInput = (e) => {
     const selectedImage = e.target.files[0];
@@ -31,61 +25,88 @@ const Input = () => {
     const uploadTask = uploadBytesResumable(storageRef, selectedImage);
 
     uploadTask.on(
-      (error) => {
-        console.error(error);
-      },
+      "state_changed",
+      null,
+      (error) => console.error("File upload error:", error),
       async () => {
-        try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          updateDoc(doc(db, "chats", data.chatId), {
-            messages: arrayUnion({
-              text,
-              senderId: currentUser.uid,
-              img: currentUser.photoURL,
-              photo: downloadURL,
-            }),
-          });
-        } catch (error) {
-          console.error("Error uploading file:", error);
-        }
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        sendMessage(downloadURL);
       }
     );
   };
 
-  const handleSend = async () => {
-    await updateDoc(doc(db, "chats", data.chatId), {
-      messages: arrayUnion({
-        text,
-        senderId: currentUser.uid,
-        img: currentUser.photoURL,
-      }),
+  const sendMessage = async (downloadURL = null) => {
+    const message = {
+      text,
+      senderId: currentUser.uid,
+      img: currentUser.photoURL,
+      photo: downloadURL || null,
+    };
+
+    const chatRef = doc(db, "chats", data.chatId);
+
+    // Add message to chat document
+    await updateDoc(chatRef, {
+      messages: arrayUnion(message),
     });
 
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      [data.chatId]: text,
-    });
-    
-    const CollectionRef = collection(db, "users");
-    const querySnapshot = await getDocs(CollectionRef);
-    const uids = [];
-    querySnapshot.forEach((doc) => {
-      uids.push( doc.id);
+    // Set the timestamp separately
+    await updateDoc(chatRef, {
+      timestamp: serverTimestamp(),
     });
 
-    uids.forEach(uid => {
-      if (data.chatId.includes(uid)) {
-        updateDoc(doc(db, "users", uid), {
-          [data.chatId]: text,
-        });
-        console.log("UPDATED: ",uid)
-        
-      }
-    });
+    // Update LastMessage field for both users
+    await updateLastMessage(currentUser.uid, data.chatId, message);
+    const otherUserId = data.chatId.replace(currentUser.uid, '').split(/(\w{28})/).filter(Boolean).find(id => id !== currentUser.uid);
+    if (otherUserId) {
+      await updateLastMessage(otherUserId, data.chatId, message);
+    } else {
+      console.error("Could not determine the other user's UID");
+    }
 
     setText("");
     setFile(null);
   };
+  
 
+  const updateLastMessage = async (userId, chatId, message) => {
+    try {
+      const userDocRef = doc(db, "users", userId);
+      await updateDoc(userDocRef, {
+        [`conversation.${chatId}`]: message.text,  // Using dot notation to set the chatId key
+      });
+  
+      const otherUserId = chatId.replace(currentUser.uid, '')
+        .split(/(\w{28})/)
+        .filter(Boolean)
+        .find(id => id !== currentUser.uid);
+  
+      if (otherUserId) {
+        return { success: true, otherUserId };
+      } else {
+        return { success: false, error: "Could not determine the other user's UID" };
+      }
+    } catch (error) {
+      console.error("Error updating last message:", error);
+      return { success: false, error: error.message };
+    }
+  };
+  
+
+ 
+  const handleSend = () => {
+    if (file) {
+      handleFileInput({ target: { files: [file] } });
+    } else {
+      sendMessage();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
   return (
     <div className="input">
       <input
@@ -99,11 +120,11 @@ const Input = () => {
           type="file"
           style={{ display: "none" }}
           id="file"
-          onChange={handleFileInput}
+          onChange={(e) => setFile(e.target.files[0])}
+          onKeyDown={handleKeyDown}
         />
-
         <label htmlFor="file">
-          <img src={volt} alt="" />
+          <img src="C:\Users\david\OneDrive\Desktop\Chat\yarned\src\img\100.png" alt="" /> 
         </label>
         <button onClick={handleSend}>Send</button>
       </div>

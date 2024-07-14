@@ -1,0 +1,113 @@
+/* Post.css */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin: 20px auto;
+}
+
+input[type="text"], textarea {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type="file"] {
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/* Poststyle.css */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.post {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 10px;
+  width: 300px;
+  text-align: center;
+  border-radius: 10px; /* Slightly rounded corners for posts */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for a more professional look */
+}
+
+.post img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px; /* Slightly rounded corners for images */
+}
+
+.post-actions {
+  margin-top: 10px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 20px; /* Slightly rounded corners for buttons */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: rgb(121, 71, 71); /* Gray color when not hovered or clicked */
+  color: white; /* Ensure text is visible */
+}
+
+button:hover {
+  background-color: rgb(255, 20, 103); /* Yellow color on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.active {
+  background-color: #007f17; /* Active color */
+  color: white;
+}
+
+button.post-button {
+  background-color: gray; /* Gray color for post button when not hovered or clicked */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px; /* Slightly rounded corners for post button */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button.post-button:hover {
+  background-color: yellow; /* Yellow color on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 10px;
+  border-radius: 10px; /* Slightly rounded corners for image previews */
+  object-fit: cover;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+input[type="file"] {
+  margin-bottom: 10px;
+}
+
+.post-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

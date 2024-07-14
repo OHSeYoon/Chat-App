@@ -1,18 +1,19 @@
-import { collection, getDocs } from "firebase/firestore";
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { ChatContext } from "../context/ChatContext";
-import { db } from "../firebase";
+import { collection, getDocs } from 'firebase/firestore';
+import React, { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { ChatContext } from '../context/ChatContext';
+import { db } from '../firebase';
+import './Styles.scss';
 
-const Chats = () => {
+const Chats = ({ onSelectMessage }) => {
   const [users, setUsers] = useState([]);
   const { currentUser } = useContext(AuthContext);
-  const { data, dispatch, setTrigger } = useContext(ChatContext);
+  const { dispatch, setTrigger } = useContext(ChatContext);
 
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const usersCollectionRef = collection(db, "users");
+        const usersCollectionRef = collection(db, 'users');
         const querySnapshot = await getDocs(usersCollectionRef);
         const usersData = [];
         querySnapshot.forEach((doc) => {
@@ -20,38 +21,53 @@ const Chats = () => {
         });
 
         setUsers(usersData);
-        console.log("Chats:", usersData);
+        console.log('Chats:', usersData);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       }
     };
 
     getUsers();
   }, []);
 
-  const handleSelect = (user) => {
-    dispatch({ type: "CHANGE_USER", payload: user.id });
+  const handleSelect = async (user) => {
+    const chatId =
+      currentUser.uid > user.id
+        ? currentUser.uid + user.id
+        : user.id + currentUser.uid;
+
+    dispatch({ type: 'CHANGE_USER', payload: user.id });
     console.log(`Chats: \nSelected User: ${user.id}\nCurrent User: ${currentUser.uid}`);
-    setTrigger(user.id);
+    setTrigger(chatId);
+
   };
 
   return (
     <div className="chats">
-      {users.map((user) => (
-        <div
-          className="userChat"
-          key={user.id}
-          onClick={() => handleSelect(user)}
-        >
-          <img src={user.data.photoURL} alt="" />
-          <div className="userChatInfo">
-            <span>{user.data.displayName}</span>
-            {user.data[data.chatId] && (
-              <p>{user.data[data.chatId]}</p>
-            )}
+      {users.map((user) => {
+        const chatId =
+          currentUser.uid > user.id
+            ? currentUser.uid + user.id
+            : user.id + currentUser.uid;
+
+        return (
+          <div
+            className="userChat"
+            key={user.id}
+            onClick={() => handleSelect(user)}
+          >
+            <img src={user.data.photoURL} alt="" />
+            <div className="userChatInfo">
+              <span>{user.data.displayName}</span>
+              <p>
+                {user.data.conversation && user.data.conversation[chatId]
+                  ? user.data.conversation[chatId]
+                  : 'NO MESSAGE'}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
